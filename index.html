@@ -23,7 +23,15 @@
     }
     .icon { font-size: 3rem; margin-bottom: 16px; }
     h1 { font-size: 1.4rem; font-weight: 700; color: #1d1d1f; letter-spacing: -0.03em; margin-bottom: 8px; }
-    p { color: #6e6e73; font-size: 0.95rem; line-height: 1.6; }
+    p { color: #6e6e73; font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
+    .badge {
+      display: inline-block; margin-top: 12px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .badge-ai   { background: #e8f5ff; color: #0071e3; }
+    .badge-demo { background: #fff3e0; color: #bf6000; }
     .spinner {
       width: 36px; height: 36px;
       border: 3px solid #e8e8ed;
@@ -34,17 +42,18 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .hidden { display: none; }
-    .retry {
-      margin-top: 20px;
+    .btn {
+      margin-top: 16px;
       padding: 12px 24px;
-      background: #2CA3E1;
-      color: #fff;
       border: 0;
       border-radius: 999px;
       font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
+      display: inline-block;
     }
+    .btn-primary { background: #2CA3E1; color: #fff; }
+    .btn-secondary { background: #e8e8ed; color: #1d1d1f; margin-left: 8px; }
   </style>
 </head>
 <body>
@@ -53,29 +62,73 @@
   <h1>Study Helper for SA</h1>
   <div class="spinner" id="spinner"></div>
   <p id="msg">서버에 연결 중...</p>
-  <button class="retry hidden" id="retry" onclick="load()">다시 시도</button>
+  <div id="badge-area"></div>
+  <div id="btn-area"></div>
 </div>
 <script>
-function load() {
+const RAILWAY = 'https://study-helper-sa-production.up.railway.app';
+
+function showBadge(type) {
+  const el = document.getElementById('badge-area');
+  if (type === 'ai') {
+    el.innerHTML = '<span class="badge badge-ai">Claude AI 연결됨</span>';
+  } else if (type === 'demo') {
+    el.innerHTML = '<span class="badge badge-demo">데모 모드 (Mac 꺼짐)</span>';
+  }
+}
+
+function goTo(url) {
+  document.getElementById('msg').textContent = '이동 중...';
+  window.location.replace(url);
+}
+
+async function pingTunnel(url) {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(url + '/api/status', { signal: ctrl.signal, cache: 'no-store' });
+    clearTimeout(timer);
+    return r.ok;
+  } catch { return false; }
+}
+
+async function load() {
   document.getElementById('spinner').classList.remove('hidden');
-  document.getElementById('retry').classList.add('hidden');
+  document.getElementById('badge-area').innerHTML = '';
+  document.getElementById('btn-area').innerHTML = '';
   document.getElementById('msg').textContent = '서버에 연결 중...';
 
-  fetch('https://api.github.com/repos/why8410/study-helper-redirect/contents/url.txt', {
-    headers: { 'Accept': 'application/vnd.github.v3+json' },
-    cache: 'no-store'
-  })
-  .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
-  .then(d => {
-    const url = atob(d.content.replace(/\n/g, ''));
-    document.getElementById('msg').textContent = '이동 중...';
-    window.location.replace(url);
-  })
-  .catch(() => {
+  try {
+    const r = await fetch('https://api.github.com/repos/why8410/study-helper-redirect/contents/url.txt', {
+      headers: { Accept: 'application/vnd.github.v3+json' },
+      cache: 'no-store'
+    });
+    if (!r.ok) throw new Error('no url.txt');
+    const d = await r.json();
+    const tunnelUrl = atob(d.content.replace(/\n/g, '')).trim();
+
+    document.getElementById('msg').textContent = 'Mac 서버 확인 중...';
+    const alive = tunnelUrl && await pingTunnel(tunnelUrl);
+
     document.getElementById('spinner').classList.add('hidden');
-    document.getElementById('retry').classList.remove('hidden');
-    document.getElementById('msg').textContent = 'Mac이 꺼져 있거나 앱이 실행되지 않았어요.\nStudy Helper 앱을 실행한 뒤 다시 시도해 주세요.';
-  });
+
+    if (alive) {
+      showBadge('ai');
+      document.getElementById('msg').textContent = 'Claude AI로 연결합니다.';
+      setTimeout(() => goTo(tunnelUrl), 800);
+    } else {
+      showBadge('demo');
+      document.getElementById('msg').textContent = 'Mac이 꺼져있어요.\n클라우드 서버(데모 모드)로 연결합니다.';
+      document.getElementById('btn-area').innerHTML =
+        '<button class="btn btn-primary" onclick="goTo(RAILWAY)">데모로 열기</button>' +
+        '<button class="btn btn-secondary" onclick="load()">다시 시도</button>';
+    }
+  } catch (e) {
+    document.getElementById('spinner').classList.add('hidden');
+    document.getElementById('msg').textContent = '연결에 실패했어요.\n인터넷 연결을 확인해 주세요.';
+    document.getElementById('btn-area').innerHTML =
+      '<button class="btn btn-primary" onclick="load()">다시 시도</button>';
+  }
 }
 load();
 </script>
