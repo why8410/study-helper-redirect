@@ -30,12 +30,12 @@
       border-radius: 999px;
       font-size: 0.8rem; font-weight: 600;
     }
-    .badge-ai   { background: #e8f5ff; color: #0071e3; }
+    .badge-ai   { background: #EDE9FE; color: #5B21B6; }
     .badge-demo { background: #fff3e0; color: #bf6000; }
     .spinner {
       width: 36px; height: 36px;
       border: 3px solid #e8e8ed;
-      border-top-color: #2CA3E1;
+      border-top-color: #7C3AED;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 20px auto;
@@ -52,7 +52,7 @@
       cursor: pointer;
       display: inline-block;
     }
-    .btn-primary { background: #2CA3E1; color: #fff; }
+    .btn-primary { background: #7C3AED; color: #fff; }
     .btn-secondary { background: #e8e8ed; color: #1d1d1f; margin-left: 8px; }
   </style>
 </head>
@@ -82,6 +82,26 @@ function goTo(url) {
   window.location.replace(url);
 }
 
+async function getTunnelUrl() {
+  // 1순위: GitHub Contents API (가장 최신)
+  try {
+    const r = await fetch('https://api.github.com/repos/why8410/study-helper-redirect/contents/url.txt', {
+      headers: { Accept: 'application/vnd.github.v3+json' },
+      cache: 'no-store'
+    });
+    if (r.ok) {
+      const d = await r.json();
+      return atob(d.content.replace(/\n/g, '')).trim();
+    }
+  } catch {}
+  // 2순위: raw CDN (API 요청 한도 초과 시 — 최대 5분 캐시)
+  try {
+    const r2 = await fetch('https://raw.githubusercontent.com/why8410/study-helper-redirect/main/url.txt?t=' + Date.now(), { cache: 'no-store' });
+    if (r2.ok) return (await r2.text()).trim();
+  } catch {}
+  return '';
+}
+
 async function pingTunnel(url) {
   try {
     const ctrl = new AbortController();
@@ -99,13 +119,7 @@ async function load() {
   document.getElementById('msg').textContent = '서버에 연결 중...';
 
   try {
-    const r = await fetch('https://api.github.com/repos/why8410/study-helper-redirect/contents/url.txt', {
-      headers: { Accept: 'application/vnd.github.v3+json' },
-      cache: 'no-store'
-    });
-    if (!r.ok) throw new Error('no url.txt');
-    const d = await r.json();
-    const tunnelUrl = atob(d.content.replace(/\n/g, '')).trim();
+    const tunnelUrl = await getTunnelUrl();
 
     document.getElementById('msg').textContent = 'Mac 서버 확인 중...';
     const alive = tunnelUrl && await pingTunnel(tunnelUrl);
