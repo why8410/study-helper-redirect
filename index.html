@@ -73,7 +73,7 @@ function showBadge(type) {
   if (type === 'ai') {
     el.innerHTML = '<span class="badge badge-ai">Claude AI 연결됨</span>';
   } else if (type === 'demo') {
-    el.innerHTML = '<span class="badge badge-demo">데모 모드 (Mac 꺼짐)</span>';
+    el.innerHTML = '<span class="badge badge-demo">데모 모드</span>';
   }
 }
 
@@ -132,7 +132,7 @@ async function load() {
       setTimeout(() => goTo(tunnelUrl), 800);
     } else {
       showBadge('demo');
-      document.getElementById('msg').textContent = 'Mac이 꺼져있어요.\n클라우드 서버(데모 모드)로 연결합니다.';
+      document.getElementById('msg').textContent = 'Mac 서버에 연결할 수 없어요.\n(꺼져 있거나 네트워크에서 터널이 차단됨)\n데모 모드로 연결합니다.';
       document.getElementById('btn-area').innerHTML =
         '<button class="btn btn-primary" onclick="goTo(RAILWAY)">데모로 열기</button>' +
         '<button class="btn btn-secondary" onclick="load()">다시 시도</button>';
