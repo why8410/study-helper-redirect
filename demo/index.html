@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Helper for SA | 초등 2학년 영어 도우미</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#7C3AED" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Study Helper" />
+    <link rel="stylesheet" href="./vendor/why/tokens.css" />
+    <link rel="stylesheet" href="./vendor/why/why-clean.css" />
+    <link rel="stylesheet" href="./vendor/why/why-app.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="cw-root">
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow" aria-hidden="true">STUDY HELPER FOR SA</p>
+          <h1>영어 숙제 도우미</h1>
+          <p class="hero-text">
+            문제를 사진으로 찍고 번호를 고르면, 정답을 바로 알려주지 않고
+            한 단계씩 힌트로 도와줄게요. 답은 맨 마지막에만 열려요.
+          </p>
+          <div class="hero-actions">
+            <button class="pill primary" id="start-camera-hero" type="button" aria-pressed="false">
+              사진 찍기 시작
+            </button>
+            <button class="pill secondary" id="focus-prompt" type="button">어른 설정 열기</button>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-orb orb-one"></div>
+          <div class="hero-orb orb-two"></div>
+          <div class="status-row">
+            <span class="status-chip" id="api-mode-chip">연결 확인 중</span>
+            <span class="status-subtitle" id="api-model-text">모델 정보 확인 중</span>
+          </div>
+          <ol class="step-guide">
+            <li><strong>1</strong> 문제를 사진 찍기</li>
+            <li><strong>2</strong> 몇 번 문제인지 고르기</li>
+            <li><strong>3</strong> 힌트 차례차례 보기</li>
+            <li><strong>4</strong> 내 답을 쓰고 정답 열기</li>
+          </ol>
+        </div>
+      </header>
+
+      <div class="step-progress" id="step-progress" aria-label="학습 진행 단계">
+        <div class="step-dot step-dot--active" data-step="1"><span>1</span><small>사진</small></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="2"><span>2</span><small>문제</small></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="3"><span>3</span><small>힌트</small></div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="4"><span>4</span><small>정답</small></div>
+      </div>
+
+      <main class="app-grid">
+        <section class="panel camera-panel" id="camera-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">1단계</p>
+              <h2>문제를 사진 찍기</h2>
+            </div>
+            <span class="panel-badge" aria-hidden="true">Sky Mint</span>
+          </div>
+
+          <div class="camera-stage" id="camera-stage" hidden>
+            <video id="camera-preview" autoplay playsinline muted></video>
+            <div class="camera-overlay" id="camera-guide-overlay">
+              <div class="overlay-tag">📷 전체 화면이 분석됩니다</div>
+            </div>
+            <img id="captured-preview" alt="촬영된 문제 미리보기" hidden />
+            <div class="camera-empty" id="camera-empty">
+              <p>카메라를 켜면 여기에서 문제집을 바로 볼 수 있어요.</p>
+              <span>찍기가 어려우면 아래에서 사진을 올려도 돼요.</span>
+            </div>
+          </div>
+
+          <canvas id="capture-canvas" hidden></canvas>
+
+          <div class="camera-controls">
+            <button
+              class="action primary"
+              id="start-camera-button"
+              type="button"
+              aria-pressed="false"
+            >
+              카메라 켜기
+            </button>
+            <button class="action secondary" id="ask-live-button" type="button" hidden>
+              지금 화면으로 도와줘
+            </button>
+            <button class="action ghost" id="capture-button" type="button" hidden>
+              사진 찍기
+            </button>
+          </div>
+
+          <div class="upload-row">
+            <label class="upload-card" for="image-upload-camera">
+              <span>📷 카메라로 바로 찍기</span>
+              <small>누르면 카메라가 바로 열려요</small>
+            </label>
+            <input id="image-upload-camera" type="file" accept="image/*" capture="environment" />
+            <label class="upload-card" for="image-upload">
+              <span>🖼 사진첩에서 고르기</span>
+              <small>이미 찍은 사진도 올릴 수 있어요</small>
+            </label>
+            <input id="image-upload" type="file" accept="image/*" />
+          </div>
+
+          <button class="action primary wide big-cta" id="analyze-button">도와줘!</button>
+
+          <div class="message-box" id="message-box" role="status" aria-live="polite">
+            <span class="spinner" id="analysis-spinner" hidden aria-hidden="true"></span>
+            <span id="message-text">먼저 문제를 사진 찍거나 올려 주세요.</span>
+          </div>
+        </section>
+
+        <section class="panel result-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">2단계</p>
+              <h2>몇 번 문제인지 고르기</h2>
+            </div>
+            <span class="panel-badge" aria-hidden="true">Focus</span>
+          </div>
+
+          <div class="focus-summary">
+            <div class="summary-bubble">
+              <span class="summary-label">고른 문제</span>
+              <strong id="selected-problem-number">-</strong>
+            </div>
+            <div class="summary-bubble">
+              <span class="summary-label">문제 종류</span>
+              <strong id="problem-summary">아직 안 봤어요</strong>
+            </div>
+          </div>
+
+          <div class="problem-number-list" id="problem-number-list"></div>
+
+          <article class="explain-card">
+            <h3>문제 뜻</h3>
+            <p id="translation-text">사진을 보고 나면 여기에 쉬운 뜻이 나와요.</p>
+          </article>
+
+          <article class="explain-card source-card">
+            <h3>읽은 문제</h3>
+            <p id="source-excerpt-text">사진에서 읽었거나 직접 적은 문제가 여기에 나와요.</p>
+          </article>
+
+          <article class="explain-card highlight">
+            <h3>먼저 생각해 볼 점</h3>
+            <p id="thinking-prompt-text">정답보다 먼저 어떤 단서를 보면 좋은지 알려줘요.</p>
+          </article>
+
+          <article class="explain-card voice-card">
+            <div class="voice-head">
+              <div>
+                <h3>소리로 듣기</h3>
+                <p id="speech-status-text">코칭 내용을 천천히 읽어줄 수 있어요.</p>
+              </div>
+              <label class="voice-toggle">
+                <input id="auto-speech-toggle" type="checkbox" />
+                <span>자동으로 읽기</span>
+              </label>
+            </div>
+            <div class="voice-actions">
+              <button class="action secondary" id="play-coaching-audio-button" type="button">
+                읽어주기
+              </button>
+              <button class="action ghost" id="stop-coaching-audio-button" type="button">
+                그만 읽기
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel hints-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">3단계</p>
+              <h2>힌트 차례차례 보기</h2>
+            </div>
+            <span class="panel-badge soft" aria-hidden="true">Step by Step</span>
+          </div>
+
+          <div class="hints-grid" id="hints-grid"></div>
+
+          <div class="answer-card">
+            <div class="answer-head">
+              <div>
+                <p>마지막 단계</p>
+                <h3>정답과 풀이</h3>
+              </div>
+              <button class="action secondary" id="reveal-answer-button">정답 열기</button>
+            </div>
+            <div class="answer-attempt">
+              <label class="field" for="child-answer-input">
+                <span>✏️ 내 생각엔 답이 뭔 것 같아? 먼저 써봐!</span>
+                <input id="child-answer-input" type="text" placeholder="여기에 내 답 적기..." />
+              </label>
+            </div>
+            <div class="answer-body is-locked" id="answer-body">
+              <p id="check-question-text">힌트를 모두 본 다음에 열 수 있어요 🔒</p>
+              <dl>
+                <div>
+                  <dt>🎯 정답</dt>
+                  <dd id="final-answer-text">아직 잠겨있어요</dd>
+                </div>
+                <div>
+                  <dt>💡 왜 그게 답일까?</dt>
+                  <dd id="final-explanation-text">힌트를 다 보면 열려요!</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel parent-panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">어른용</p>
+              <h2>부모 요약</h2>
+            </div>
+            <span class="panel-badge" aria-hidden="true">Review</span>
+          </div>
+
+          <div class="parent-grid">
+            <article class="parent-card">
+              <h3>코칭 메모</h3>
+              <p id="coach-intro-text">아이가 스스로 풀도록 힌트 중심으로 안내해요.</p>
+            </article>
+            <article class="parent-card">
+              <h3>부모 요약</h3>
+              <p id="parent-summary-text">분석 후 여기에 부모용 한 줄 요약이 나와요.</p>
+            </article>
+            <article class="parent-card">
+              <h3>안내 메모</h3>
+              <p id="confidence-note-text">사진이 흔들리면 다시 찍도록 안내해요.</p>
+            </article>
+          </div>
+
+          <details class="parent-settings">
+            <summary>어른 설정 (질문 직접 쓰기 · 문제 번호 · 직접 입력)</summary>
+            <div class="prompt-stack">
+              <label class="field">
+                <span>아이 질문 직접 쓰기</span>
+                <div class="input-with-button">
+                  <input
+                    id="request-text"
+                    type="text"
+                    placeholder="예: 3번 문제 도와줘"
+                  />
+                  <button class="mini-voice" id="voice-button" type="button">음성</button>
+                </div>
+              </label>
+
+              <div class="inline-fields">
+                <label class="field">
+                  <span>문제 번호 직접 지정</span>
+                  <input id="manual-problem-number" type="text" placeholder="예: 3" />
+                </label>
+                <label class="field">
+                  <span>텍스트로 문제 입력</span>
+                  <textarea
+                    id="typed-problem-text"
+                    rows="4"
+                    placeholder="카메라가 어려우면 영어 문제를 직접 적어도 됩니다."
+                  ></textarea>
+                </label>
+              </div>
+
+              <div class="quick-prompts">
+                <button class="quick-pill" data-prompt="1번 문제 도와줘">1번 문제 도와줘</button>
+                <button class="quick-pill" data-prompt="3번 문제 뜻 알려줘">3번 문제 뜻 알려줘</button>
+                <button class="quick-pill" data-prompt="빈칸 힌트만 줘">빈칸 힌트만 줘</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="parent-settings history-settings">
+            <summary id="history-summary">학습 기록 보기</summary>
+            <div class="history-wrap">
+              <button class="action ghost" id="refresh-history-button" type="button">기록 새로고침</button>
+              <ul class="history-list" id="history-list"></ul>
+            </div>
+          </details>
+        </section>
+      </main>
+    </div>
+
+    <script src="./demo-shim.js"></script>
+    <script src="./app.js" defer></script>
+    
+  </body>
+</html>
