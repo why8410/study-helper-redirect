@@ -1,0 +1,96 @@
+/* ============================================================
+   WHY Design System — Component & Motion Library
+   사용:  <link rel="stylesheet" href="tokens.css">
+          <link rel="stylesheet" href="why-clean.css">
+   모든 클래스는 cw- 접두사. 프로젝트 기존 스타일과 충돌 없음.
+   ============================================================ */
+
+/* ── Base ── */
+.cw-root{font-family:var(--cw-font);color:var(--cw-ink);background:var(--cw-bg);-webkit-font-smoothing:antialiased;}
+.cw-root *{box-sizing:border-box;}
+
+/* ── Typography ── */
+.cw-kicker{font-size:15px;font-weight:var(--cw-fw-semi);letter-spacing:var(--cw-ls-base);color:var(--cw-brand);margin-bottom:16px;}
+.cw-h1{font-size:var(--cw-fs-h1);font-weight:var(--cw-fw-bold);letter-spacing:var(--cw-ls-tight);line-height:1.1;color:var(--cw-ink);}
+.cw-h2{font-size:var(--cw-fs-h2);font-weight:var(--cw-fw-semi);letter-spacing:var(--cw-ls-snug);color:var(--cw-ink);}
+.cw-lead{font-size:var(--cw-fs-lead);font-weight:400;line-height:1.55;color:var(--cw-ink-2);letter-spacing:var(--cw-ls-base);}
+.cw-em{color:var(--cw-brand);}
+.cw-muted{color:var(--cw-ink-2);}
+.cw-dim{color:var(--cw-ink-3);}
+
+/* ── Button ── */
+.cw-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--cw-font);font-size:14px;font-weight:var(--cw-fw-semi);
+  letter-spacing:var(--cw-ls-base);border:1px solid var(--cw-line);background:#fff;color:var(--cw-ink);
+  border-radius:var(--cw-r-sm);padding:10px 18px;cursor:pointer;transition:background .15s,border .15s,transform .15s,box-shadow .15s;}
+.cw-btn:hover{background:var(--cw-panel);}
+.cw-btn--primary{background:var(--cw-brand);color:#fff;border-color:var(--cw-brand);}
+.cw-btn--primary:hover{background:var(--cw-brand-deep);transform:translateY(-1px);box-shadow:var(--cw-shadow-brand);}
+.cw-btn--pill{border-radius:var(--cw-r-pill);}
+
+/* ── Card ── */
+.cw-card{background:var(--cw-panel);border-radius:var(--cw-r-xl);padding:var(--cw-sp-5) 30px;position:relative;overflow:hidden;}
+.cw-card--outline{background:#fff;border:1px solid var(--cw-line);}
+.cw-card--brand{background:linear-gradient(135deg,var(--cw-brand) 0%,var(--cw-brand-deep) 100%);color:#fff;}
+.cw-card__icon{width:54px;height:54px;border-radius:15px;background:#fff;display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px;box-shadow:0 4px 14px rgba(124,58,237,.14);}
+.cw-card__icon svg{width:28px;height:28px;stroke:var(--cw-brand);fill:none;stroke-width:1.8;}
+.cw-card__title{font-size:22px;font-weight:var(--cw-fw-semi);letter-spacing:var(--cw-ls-snug);margin-bottom:8px;}
+.cw-card__desc{font-size:14.5px;line-height:1.55;color:var(--cw-ink-2);}
+
+/* ── 통계 큰 숫자 ── */
+.cw-stat{font-size:46px;font-weight:var(--cw-fw-bold);color:var(--cw-brand);letter-spacing:var(--cw-ls-tight);line-height:1;
+  font-variant-numeric:tabular-nums;}
+.cw-stat__unit{font-size:17px;color:var(--cw-ink-2);font-weight:var(--cw-fw-med);}
+.cw-stat--xl{font-size:104px;letter-spacing:-0.05em;}
+
+/* ── Badge / Pill ── */
+.cw-badge{display:inline-block;font-size:11.5px;font-weight:var(--cw-fw-semi);padding:3px 9px;border-radius:8px;
+  background:var(--cw-brand-soft);color:var(--cw-brand-deep);white-space:nowrap;}
+.cw-pill{display:inline-block;font-size:13px;font-weight:var(--cw-fw-semi);padding:5px 14px;border-radius:var(--cw-r-pill);}
+.cw-pill--done{background:var(--cw-success-bg);color:var(--cw-success);}
+.cw-pill--prog{background:var(--cw-brand-soft);color:var(--cw-brand-deep);}
+.cw-pill--todo{background:var(--cw-warn-bg);color:var(--cw-warn);}
+
+/* ── Bar (가로 막대 차트) ── */
+.cw-bar{display:flex;align-items:center;gap:16px;}
+.cw-bar__label{width:128px;font-size:15px;font-weight:var(--cw-fw-med);text-align:right;flex-shrink:0;letter-spacing:var(--cw-ls-base);}
+.cw-bar__track{flex:1;height:30px;background:var(--cw-panel);border-radius:8px;overflow:hidden;position:relative;}
+.cw-bar__fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--cw-brand),var(--cw-brand-deep));
+  transform-origin:left;transform:scaleX(var(--cw-fill,1));position:relative;overflow:hidden;}
+.cw-bar__fill::after{content:"";position:absolute;inset:0 auto 0 0;width:46%;transform:translateX(-120%);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);}
+.cw-bar__value{width:54px;font-size:16px;font-weight:var(--cw-fw-semi);color:var(--cw-brand-deep);flex-shrink:0;font-variant-numeric:tabular-nums;}
+
+/* ── Table ── */
+.cw-table{width:100%;border-collapse:collapse;font-size:14px;}
+.cw-table thead th{background:var(--cw-panel);color:var(--cw-ink-2);font-weight:var(--cw-fw-semi);font-size:12px;
+  text-align:left;padding:13px 16px;border-bottom:1px solid var(--cw-line);}
+.cw-table tbody td{padding:13px 16px;border-bottom:1px solid var(--cw-line);color:var(--cw-ink);line-height:1.5;vertical-align:top;}
+.cw-table tbody tr:hover{background:#f7f4ff;}
+
+/* ── Divider ── */
+.cw-divider{border:none;border-top:1px solid var(--cw-line);margin:var(--cw-sp-4) 0;}
+.cw-divider--dashed{border-top:1px dashed var(--cw-line);}
+
+/* ============================================================
+   Motion  (요소에 cw-reveal 부여 → 화면에 들어오거나 .is-in 시 등장)
+   ============================================================ */
+@keyframes cw-rise{0%{opacity:0;transform:translateY(38px) scale(.96);}60%{opacity:1;}100%{opacity:1;transform:none;}}
+@keyframes cw-grow{from{transform:scaleX(0);}to{transform:scaleX(var(--cw-fill,1));}}
+@keyframes cw-shimmer{0%{transform:translateX(-120%);}100%{transform:translateX(320%);}}
+@keyframes cw-pop{0%{transform:scale(.6);opacity:0;}55%{transform:scale(1.12);opacity:1;}100%{transform:scale(1);}}
+
+.cw-reveal{opacity:0;}
+.cw-reveal.is-in{animation:cw-rise .8s var(--cw-ease) forwards;}
+.cw-reveal.d1{animation-delay:.05s;} .cw-reveal.d2{animation-delay:.20s;}
+.cw-reveal.d3{animation-delay:.35s;} .cw-reveal.d4{animation-delay:.50s;}
+.cw-reveal.d5{animation-delay:.65s;} .cw-reveal.d6{animation-delay:.80s;}
+
+.is-in .cw-bar__fill{animation:cw-grow 1.05s cubic-bezier(.16,.84,.3,1) forwards;}
+.is-in .cw-bar__fill::after{animation:cw-shimmer 1.1s ease forwards;}
+
+.is-in .cw-stat--pop{animation:cw-pop .7s var(--cw-ease) both;}
+
+@media (prefers-reduced-motion: reduce){
+  .cw-reveal,.cw-reveal.is-in,.is-in .cw-bar__fill,.is-in .cw-bar__fill::after{animation:none!important;opacity:1!important;transform:none!important;}
+}
